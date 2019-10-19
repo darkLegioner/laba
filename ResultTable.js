@@ -20,13 +20,16 @@ const styles = theme => ({
   },
   dataCell:{
     backgroundColor: 'white'
+  },
+  dataCellMin:{
+    backgroundColor: 'yellow'
   }
 });
 
-class  Step_0 extends React.Component {
+class  ResultTable extends React.Component {
   render (){
     const { classes } = this.props;
-    const { values } = this.props;
+    const { title, values, minValue, columns } = this.props;
 
     return (
       <Paper className={classes.root}>
@@ -37,24 +40,22 @@ class  Step_0 extends React.Component {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>1</TableCell>
-              <TableCell>2</TableCell>
-              <TableCell>3</TableCell>
-              <TableCell>4</TableCell>
-              <TableCell>5</TableCell>
+              {columns.map(function(column){
+                return <TableCell>{column}</TableCell>
+              })}
+              
             </TableRow>
           </TableHead>
           <TableBody>
             {
-              values.map(function(item, index){
-                console.log(item)
+              columns.map(function(item, index){
                 return (
                   <TableRow key={index}>
-                    <TableCell  align="right">{index+1}</TableCell>
-                    {item.map(function(cell, index){
+                    <TableCell  align="right">{item}</TableCell>
+                    {columns.map(function(cell, index){
                       return (
                         <TableCell align="right" className={classes.dataCell}>
-                          {cell}
+                          {values[item][cell]}
                         </TableCell>
                       )
                     })
@@ -71,4 +72,4 @@ class  Step_0 extends React.Component {
 
 }
 
-export default withStyles(styles)(Step_0);
+export default withStyles(styles)(ResultTable);
