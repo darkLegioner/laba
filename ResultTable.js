@@ -54,7 +54,7 @@ class  ResultTable extends React.Component {
                     <TableCell  align="right">{item}</TableCell>
                     {columns.map(function(cell, index){
                       return (
-                        <TableCell align="right" className={classes.dataCell}>
+                        <TableCell align="right" className={values[item][cell] === minValue.value ? classes.dataCellMin : classes.dataCell}>
                           {values[item][cell]}
                         </TableCell>
                       )

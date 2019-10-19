@@ -13,6 +13,7 @@ import Icon from '@material-ui/core/Icon';
 import Button from '@material-ui/core/Button';
 
 import ResultTable from './ResultTable'
+import DrawChart from './DrawChart'
 
 const styles = theme => ({
   root: {
@@ -33,6 +34,15 @@ const defaultValues = {
 }
 const defaultColumns = ['1','2','3','4','5']
 
+function getCluster(item) {
+  let list = []
+  item.forEach(function(col){
+    let tmp = typeof col === 'number' ? [col] : getCluster(col)
+    list.push(...tmp)
+  })
+  return list
+}
+
 class  ClusterLaba extends React.Component {
   constructor(props) {
     super(props);
@@ -43,6 +53,11 @@ class  ClusterLaba extends React.Component {
       step_1_values: {},
       step_2_values: {},
       step_3_values: {},
+      first_cluster: [],
+      second_cluster: [],
+      first_centroid: [],
+      second_centroid: [],
+      dataPoints: [],
       viewSolution: false
     }
   }
@@ -108,7 +123,6 @@ class  ClusterLaba extends React.Component {
             if ( parseInt(columns[j]) ){
               cell = values[columns[i]][columns[j]]
             } else {
-              console.log(columns[j], previousMinColumn)
               if ( columns[j] === previousMinColumn ) {
                 cell = ((values[columns[i]][previousMinValue.x]+values[columns[i]][previousMinValue.y])-Math.abs(values[columns[i]][previousMinValue.x]-values[columns[i]][previousMinValue.y])/2)/2
               } else {
@@ -156,9 +170,19 @@ class  ClusterLaba extends React.Component {
     return(Math.pow(value, st))
   }
 
+  getCentroid(cluster, values) {
+    let x = 0
+    let y = 0
+    cluster.forEach(function(item){
+      x += parseFloat(values[item][0])/cluster.length
+      y += parseFloat(values[item][1])/cluster.length
+    })
+    return [x,y]
+  }
+
   render (){
     const { classes } = this.props;
-    const { values, viewSolution, step_0_values, columns } = this.state;
+    const { values, viewSolution, step_0_values, step_1_values, step_2_values, step_3_values, columns, first_cluster, second_cluster, first_centroid,second_centroid, dataPoints } = this.state;
 
     const handleChange = (i, j) => event => {
       let newValues = values;
@@ -171,9 +195,47 @@ class  ClusterLaba extends React.Component {
       let step_1 = this.iteration_step(step_0)
       let step_2 = this.iteration_step(step_1)
       let step_3 = this.iteration_step(step_2)
-      console.log(step_3.values)
+      let first_cluster = getCluster(JSON.parse(step_3.columns[0]))
+      let second_cluster = getCluster(JSON.parse(step_3.columns[1]))
+      let first_centroid = this.getCentroid(first_cluster, values)
+      let second_centroid = this.getCentroid(second_cluster, values)
+      let dataPoints = []
+      columns.forEach(function(item){
+        dataPoints.push({
+          x: values[item][0],
+          y: values[item][1],
+          cluster: first_cluster.includes[item] ? '1':'2',
+          color: first_cluster.includes[item] ? 'green':'blue',
+        })
+      })
 
-      this.setState({step_0_values: step_0}, function(){
+      dataPoints.push({
+        x: first_centroid[0],
+        y: first_centroid[1],
+        cluster: '1',
+        color: 'red',
+      })
+
+      dataPoints.push({
+        x: second_centroid[0],
+        y: second_centroid[1],
+        cluster: '2',
+        color: 'red',
+      })
+
+      console.log(dataPoints)
+
+      this.setState({
+        step_0_values: step_0,
+        step_1_values: step_1,
+        step_2_values: step_2,
+        step_3_values: step_3,
+        first_cluster: first_cluster,
+        second_cluster: second_cluster,
+        first_centroid: first_centroid,
+        second_centroid: second_centroid,
+        dataPoints: dataPoints
+      }, function(){
         this.setState({viewSolution: true})
       })
     };
@@ -244,9 +306,28 @@ class  ClusterLaba extends React.Component {
         <ResultTable 
           values={step_0_values.values} 
           columns={step_0_values.columns} 
-          minValues={step_0_values.minValues} 
+          minValue={step_0_values.minValue} 
           title={step_0_values.title}
           />
+        <ResultTable 
+        values={step_1_values.values} 
+        columns={step_1_values.columns} 
+        minValue={step_1_values.minValue} 
+        title={step_1_values.title}
+        />
+        <ResultTable 
+        values={step_2_values.values} 
+        columns={step_2_values.columns} 
+        minValue={step_2_values.minValue} 
+        title={step_2_values.title}
+        />
+        <ResultTable 
+        values={step_3_values.values} 
+        columns={step_3_values.columns} 
+        minValue={step_3_values.minValue} 
+        title={step_3_values.title}
+        />
+        <DrawChart dataPoints={dataPoints} />
       </Paper>
       }
       </div>
