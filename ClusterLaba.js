@@ -41,31 +41,16 @@ const styles = theme => ({
 });
 
 const defaultValues = {
-  '1':[2.6,10], 
+  '1': [2.6,10], 
   '2': [4,7.6], 
   '3': [8.6,6],
   '4': [12,11.6],
   '5': [13.6,9]
 }
 const defaultColumns = ['1','2','3','4','5']
-const defaultState = {
-      values: defaultValues,
-      columns: defaultColumns,
-      step_0_values: {},
-      step_1_values: {},
-      step_2_values: {},
-      step_3_values: {},
-      first_cluster: [],
-      second_cluster: [],
-      first_centroid: [],
-      second_centroid: [],
-      dataPoints: [],
-      viewSolution: false
-    }
 
 function getCluster(item) {
   let list = []
-  console.log(item)
   typeof item === 'number' ? list.push(item) : item.forEach(function(col){
     let tmp = typeof col === 'number' ? [col] : getCluster(col)
     list.push(...tmp)
@@ -80,7 +65,22 @@ function math_pow(value, st) {
 class  ClusterLaba extends React.Component {
   constructor(props) {
     super(props);
-    this.state = defaultState
+    let state = {
+      values: {},
+      columns: defaultColumns,
+      step_0_values: {},
+      step_1_values: {},
+      step_2_values: {},
+      step_3_values: {},
+      first_cluster: [],
+      second_cluster: [],
+      first_centroid: [],
+      second_centroid: [],
+      dataPoints: [],
+      viewSolution: false
+    }
+    Object.assign(state.values, defaultValues)
+    this.state = state
   }
   
   step_zero() {
@@ -191,7 +191,6 @@ class  ClusterLaba extends React.Component {
   getDisp(cluster, values, centroid) {
     let tmp = 0
     cluster.forEach(function(item){
-      console.log(values[item][0], centroid[0])
       tmp += ( math_pow( ( parseFloat(values[item][0]) - parseFloat(centroid[0]) ),2 )
              + math_pow( ( parseFloat(values[item][1]) - parseFloat(centroid[1]) ),2 ) )/cluster.length
     })
@@ -201,10 +200,8 @@ class  ClusterLaba extends React.Component {
   getRadius(cluster, values, centroid) {
     let tmp = []
     cluster.forEach(function(item){
-      console.log(values[item][0], centroid[0])
       tmp.push(math_pow( math_pow(values[item][0]-centroid[0], 2) + math_pow(values[item][1]-centroid[1], 2), 0.5))
     })
-    console.log(Math.max.apply(null, tmp))
     return Math.max.apply(null, tmp)
   }
 
@@ -223,15 +220,22 @@ class  ClusterLaba extends React.Component {
     const { values, viewSolution, step_0_values, step_1_values, step_2_values, step_3_values, columns, first_cluster, second_cluster, first_centroid,second_centroid, dataPoints, radius_2, radius_1, disp_1, disp_2 } = this.state;
 
     const handleChange = (i, j) => event => {
-     
       let newValues = values;
       newValues[i][j] = parseFloat(event.target.value);
-      console.log(i,j,values[i],[j],newValues)
-      this.setState({values: newValues})
+      this.setState({values: Object.assign({}, newValues)})
     };
     
     const resetClick = () => {
-      this.setState({...defaultState})
+      this.setState({
+        values: {
+          '1': [2.6,10], 
+          '2': [4,7.6], 
+          '3': [8.6,6],
+          '4': [12,11.6],
+          '5': [13.6,9]
+        },
+        viewSolution: false}
+      )
     }
 
     const calculateClick = () => {
