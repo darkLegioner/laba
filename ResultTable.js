@@ -11,8 +11,11 @@ import Paper from '@material-ui/core/Paper';
 
 const styles = theme => ({
   root: {
-    display: 'inline-block',
+    display: 'block',
     overflowX: 'auto',
+    margin: '10px',
+    padding: '10px',
+    width: 'fit-content'
   },
   table: {
     maxWidth: 300,
@@ -34,7 +37,7 @@ class  ResultTable extends React.Component {
     return (
       <Paper className={classes.root}>
         <Typography variant="h5" gutterBottom>
-          Шаг 0: Матрица расстояний
+          {title}
         </Typography>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>

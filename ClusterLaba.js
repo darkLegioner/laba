@@ -18,10 +18,17 @@ import DrawChart from './DrawChart'
 
 const styles = theme => ({
   root: {
-    display: 'inline-block',
-    overflowX: 'auto',
+    display: 'block',
+    overflowX: 'auto'
   },
-    table: {
+  card: {
+    display: 'block',
+    overflowX: 'auto',
+    margin: '10px',
+    padding: '10px',
+    width: 'fit-content'
+  },
+  table: {
     maxWidth: 300,
     backgroundColor: '#d6d6d6'
   },
@@ -280,7 +287,7 @@ class  ClusterLaba extends React.Component {
     return (
       <div>
         <form className={classes.container} noValidate autoComplete="off">
-          <Paper className={classes.root}>
+          <Paper className={classes.card}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -338,7 +345,7 @@ class  ClusterLaba extends React.Component {
       >
         Расчитать
       </Button>
-      { viewSolution && <Paper >
+      { viewSolution && <Paper className={classes.card} >
         <ResultTable 
           values={step_0_values.values} 
           columns={step_0_values.columns} 
@@ -363,71 +370,73 @@ class  ClusterLaba extends React.Component {
         minValue={step_3_values.minValue} 
         title={step_3_values.title}
         />
-        <Typography variant="h5" gutterBottom>
-          Шаг 4: Характеристики кластера
-        </Typography>
-        <Paper className={classes.root}>
-            <Table className={classes.table} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>t</TableCell>
-                  <TableCell align="right">A1</TableCell>
-                  <TableCell align="right">A2</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  columns.map(function(item, index){
-                    return (
-                      <TableRow key={index}>
-                        <TableCell align="right">{item}</TableCell>
-                        <TableCell align="right" className={first_cluster.includes(parseInt(item)) ? classes.dataCellYellow : classes.dataCell}>
-                          {values[item][0]}
-                        </TableCell>
-                        <TableCell align="right" className={first_cluster.includes(parseInt(item)) ? classes.dataCellYellow : classes.dataCell}>{values[item][1]}</TableCell>
-                      </TableRow>
-                    )
-                  })
-                }
-              </TableBody>
-            </Table>
-          </Paper>
-          <Paper className={classes.root}>
-            <Typography variant="h6" gutterBottom>
-              Кластер ({first_cluster.toString()}):
-            </Typography>
-            <Typography gutterBottom>
-              Центр тяжести кластера : ({first_centroid.toString()})
-            </Typography>
-            <Typography gutterBottom>
-              Дисперсия : {disp_1}
-            </Typography>
-            <Typography gutterBottom>
-              Среднеквадратичное отклонение объектов относительно центра кластера : {math_pow(disp_1,0.5)}
-            </Typography>
-            <Typography gutterBottom>
-              Радиус : {radius_1}
-            </Typography>
-          </Paper>
+        <Paper className={classes.card}>
+          <Typography variant="h5" gutterBottom>
+            Шаг 4: Характеристики кластера
+          </Typography>
+          <Paper className={classes.card}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>t</TableCell>
+                    <TableCell align="right">A1</TableCell>
+                    <TableCell align="right">A2</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {
+                    columns.map(function(item, index){
+                      return (
+                        <TableRow key={index}>
+                          <TableCell align="right">{item}</TableCell>
+                          <TableCell align="right" className={first_cluster.includes(parseInt(item)) ? classes.dataCellYellow : classes.dataCell}>
+                            {values[item][0]}
+                          </TableCell>
+                          <TableCell align="right" className={first_cluster.includes(parseInt(item)) ? classes.dataCellYellow : classes.dataCell}>{values[item][1]}</TableCell>
+                        </TableRow>
+                      )
+                    })
+                  }
+                </TableBody>
+              </Table>
+            </Paper>
+            <Paper className={classes.card}>
+              <Typography variant="h6" gutterBottom>
+                Кластер {step_3_values.columns[0]}:
+              </Typography>
+              <Typography gutterBottom>
+                Центр тяжести кластера : ({first_centroid.toString()})
+              </Typography>
+              <Typography gutterBottom>
+                Дисперсия : {disp_1}
+              </Typography>
+              <Typography gutterBottom>
+                Среднеквадратичное отклонение объектов относительно центра кластера : {math_pow(disp_1,0.5)}
+              </Typography>
+              <Typography gutterBottom>
+                Радиус : {radius_1}
+              </Typography>
+            </Paper>
 
-          <Paper className={classes.root}>
-            <Typography variant="h6" gutterBottom>
-              Кластер ({first_cluster.toString()}):
-            </Typography>
-            <Typography gutterBottom>
-              Центр тяжести кластера : ({first_centroid.toString()})
-            </Typography>
-            <Typography gutterBottom>
-              Дисперсия : {disp_1}
-            </Typography>
-            <Typography gutterBottom>
-              Среднеквадратичное отклонение объектов относительно центра кластера : {math_pow(disp_1,0.5)}
-            </Typography>
-            <Typography gutterBottom>
-              Радиус : {radius_1}
-            </Typography>
-          </Paper>
-        <DrawChart dataPoints={dataPoints} />
+            <Paper className={classes.card}>
+              <Typography variant="h6" gutterBottom>
+                Кластер {step_3_values.columns[1]}:
+              </Typography>
+              <Typography gutterBottom>
+                Центр тяжести кластера : ({second_centroid.toString()})
+              </Typography>
+              <Typography gutterBottom>
+                Дисперсия : {disp_2}
+              </Typography>
+              <Typography gutterBottom>
+                Среднеквадратичное отклонение объектов относительно центра кластера : {math_pow(disp_2,0.5)}
+              </Typography>
+              <Typography gutterBottom>
+                Радиус : {radius_2}
+              </Typography>
+            </Paper>
+          <DrawChart dataPoints={dataPoints} />
+        </Paper>
       </Paper>
       }
       </div>

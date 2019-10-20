@@ -1,10 +1,22 @@
 import React from 'react';
 import CanvasJSReact from './canvasjs/canvasjs.react';
+import { makeStyles,withStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
+const styles = theme => ({
+  card: {
+    display: 'block',
+    overflowX: 'auto',
+    margin: '10px',
+    padding: '10px'
+  }
+});
+
 class DrawChart extends React.Component {
 	render() {
+    const { classes } = this.props;
     const { dataPoints } = this.props;
     console.log
 		const options = {
@@ -14,16 +26,16 @@ class DrawChart extends React.Component {
 				text: ""
 			},
 			axisX: {
-				title:"Temperature (in °C)",
-				suffix: "°C",
+				title:"Cреднегодовая стоимость основных производственных фондов",
+				suffix: "(млн. руб.)",
 				crosshair: {
 					enabled: true,
 					snapToDataPoint: true
 				}
 			},
 			axisY:{
-				title: "Sales",
-				includeZero: false,
+				title: "Объем произведенной продукции",
+        suffix: "(млн. руб.)",
 				crosshair: {
 					enabled: true,
 					snapToDataPoint: true
@@ -32,19 +44,19 @@ class DrawChart extends React.Component {
 			data: [{
 				type: "scatter",
 				markerSize: 15,
-				toolTipContent: "<b>Temperature: </b>{x}°C<br/><b>Sales: </b>{y}",
+				toolTipContent: "<b>A1: </b>{x}<br/><b>A2: </b>{y}<br/><b>Кластер: </b>{cluster}",
 				dataPoints: dataPoints
 			}]
 		}
 		return (
-		<div>
-			<CanvasJSChart options = {options}
-				/* onRef={ref => this.chart = ref} */
-			/>
-			{/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
-		</div>
+      <Paper className={classes.card}>
+        <CanvasJSChart options = {options}
+          /* onRef={ref => this.chart = ref} */
+        />
+        {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+      </Paper>
 		);
 	}
 }
 
-export default DrawChart;             
+export default withStyles(styles)(DrawChart);
