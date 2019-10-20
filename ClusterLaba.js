@@ -159,11 +159,15 @@ class  ClusterLaba extends React.Component {
                 cell = ((values[previousMinValue.x][columns[j]]+values[previousMinValue.y][columns[j]])-Math.abs(values[previousMinValue.x][columns[j]]-values[previousMinValue.y][columns[j]])/2)/2
               }
             } else {
-              if (columns[j] === previousMinColumn){
-                cell = ((values[columns[i]][previousMinValue.x]+values[columns[i]][previousMinValue.y])-Math.abs(values[columns[i]][previousMinValue.x]-values[columns[i]][previousMinValue.y])/2)/2
-                
+              if ( parseInt(columns[j]) ){ 
+                cell = values[columns[i]][columns[j]]
               } else {
-                cell = ((values[previousMinValue.x][columns[j]]+values[previousMinValue.y][columns[j]])-Math.abs(values[previousMinValue.x][columns[j]]-values[previousMinValue.y][columns[j]])/2)/2
+                if (columns[j] === previousMinColumn){
+                  cell = ((values[columns[i]][previousMinValue.x]+values[columns[i]][previousMinValue.y])-Math.abs(values[columns[i]][previousMinValue.x]-values[columns[i]][previousMinValue.y])/2)/2
+                  
+                } else {
+                  cell = ((values[previousMinValue.x][columns[j]]+values[previousMinValue.y][columns[j]])-Math.abs(values[previousMinValue.x][columns[j]]-values[previousMinValue.y][columns[j]])/2)/2
+                }
               }
             }
           }
