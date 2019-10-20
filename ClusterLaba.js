@@ -48,24 +48,7 @@ const defaultValues = {
   '5': [13.6,9]
 }
 const defaultColumns = ['1','2','3','4','5']
-
-function getCluster(item) {
-  let list = []
-  item.forEach(function(col){
-    let tmp = typeof col === 'number' ? [col] : getCluster(col)
-    list.push(...tmp)
-  })
-  return list
-}
-
-function math_pow(value, st) {
-  return(Math.pow(value, st))
-}
-
-class  ClusterLaba extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+const defaultState = {
       values: defaultValues,
       columns: defaultColumns,
       step_0_values: {},
@@ -79,6 +62,25 @@ class  ClusterLaba extends React.Component {
       dataPoints: [],
       viewSolution: false
     }
+
+function getCluster(item) {
+  let list = []
+  console.log(item)
+  typeof item === 'number' ? list.push(item) : item.forEach(function(col){
+    let tmp = typeof col === 'number' ? [col] : getCluster(col)
+    list.push(...tmp)
+  })
+  return list
+}
+
+function math_pow(value, st) {
+  return(Math.pow(value, st))
+}
+
+class  ClusterLaba extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = defaultState
   }
   
   step_zero() {
@@ -221,10 +223,16 @@ class  ClusterLaba extends React.Component {
     const { values, viewSolution, step_0_values, step_1_values, step_2_values, step_3_values, columns, first_cluster, second_cluster, first_centroid,second_centroid, dataPoints, radius_2, radius_1, disp_1, disp_2 } = this.state;
 
     const handleChange = (i, j) => event => {
+     
       let newValues = values;
-      newValues[i][j] = event.target.value;
+      newValues[i][j] = parseFloat(event.target.value);
+      console.log(i,j,values[i],[j],newValues)
       this.setState({values: newValues})
     };
+    
+    const resetClick = () => {
+      this.setState({...defaultState})
+    }
 
     const calculateClick = () => {
       let step_0 = this.step_zero()
@@ -306,10 +314,10 @@ class  ClusterLaba extends React.Component {
                           <TextField
                             id={`item_${index}_0`}
                             className={classes.textFieldLeft}
-                            value={values[columns[index]][0]}
+                            value={values[item][0]}
                             margin="normal"
                             type="number"
-                            onChange={handleChange(index, 0)}
+                            onChange={handleChange(item, 0)}
                             InputLabelProps={{
                               shrink: true,
                             }}
@@ -319,10 +327,10 @@ class  ClusterLaba extends React.Component {
                           <TextField
                             id={`item_${index}_1`}
                             className={classes.textFieldRight}
-                            value={values[columns[index]][1]}
+                            value={values[item][1]}
                             margin="normal"
                             type="number"
-                            onChange={handleChange(index, 1)}
+                            onChange={handleChange(item, 1)}
                             InputLabelProps={{
                               shrink: true,
                             }}
@@ -338,13 +346,22 @@ class  ClusterLaba extends React.Component {
           </Paper>
         </form>
         <Button
-        variant="contained"
-        color="primary"
-        className={classes.button}
-        onClick={calculateClick}
-      >
-        Расчитать
-      </Button>
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={calculateClick}
+        >
+          Расчитать
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={resetClick}
+        >
+          Сбросить
+        </Button>
       { viewSolution && <Paper className={classes.card} >
         <ResultTable 
           values={step_0_values.values} 
