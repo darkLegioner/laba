@@ -11,6 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 
 import ResultTable from './ResultTable'
 import DrawChart from './DrawChart'
@@ -20,9 +21,16 @@ const styles = theme => ({
     display: 'inline-block',
     overflowX: 'auto',
   },
-  table: {
-    maxWidth: 200,
+    table: {
+    maxWidth: 300,
+    backgroundColor: '#d6d6d6'
   },
+  dataCell:{
+    backgroundColor: 'white'
+  },
+  dataCellYellow:{
+    backgroundColor: 'yellow'
+  }
 });
 
 const defaultValues = {
@@ -41,6 +49,10 @@ function getCluster(item) {
     list.push(...tmp)
   })
   return list
+}
+
+function math_pow(value, st) {
+  return(Math.pow(value, st))
 }
 
 class  ClusterLaba extends React.Component {
@@ -74,7 +86,7 @@ class  ClusterLaba extends React.Component {
     for (var i = 0; i < columns.length; i++) {
       let row = {}
       for (var j = 0; j < columns.length; j++) {
-        let cell = this.math_pow( this.math_pow(values[columns[i]][0]-values[columns[j]][0], 2) + this.math_pow(values[columns[i]][1]-values[columns[j]][1], 2), 0.5)
+        let cell = math_pow( math_pow(values[columns[i]][0]-values[columns[j]][0], 2) + math_pow(values[columns[i]][1]-values[columns[j]][1], 2), 0.5)
         row[columns[j]] = cell
         if ( cell < minValue.value && i !== j) {
           minValue = {
@@ -94,7 +106,7 @@ class  ClusterLaba extends React.Component {
     }
   }
 
-  iteration_step(previous_step) {
+  iteration_step(previous_step, title) {
     let iteration_step_array = {}
     let columns = [] 
     let previousMinValue = previous_step.minValue
@@ -162,12 +174,29 @@ class  ClusterLaba extends React.Component {
     return {
       values: iteration_step_array,
       columns: columns,
-      minValue: minValue
+      minValue: minValue,
+      title: title
     }
   }
 
-  math_pow(value, st) {
-    return(Math.pow(value, st))
+  getDisp(cluster, values, centroid) {
+    let tmp = 0
+    cluster.forEach(function(item){
+      console.log(values[item][0], centroid[0])
+      tmp += ( math_pow( ( parseFloat(values[item][0]) - parseFloat(centroid[0]) ),2 )
+             + math_pow( ( parseFloat(values[item][1]) - parseFloat(centroid[1]) ),2 ) )/cluster.length
+    })
+    return tmp
+  }
+
+  getRadius(cluster, values, centroid) {
+    let tmp = []
+    cluster.forEach(function(item){
+      console.log(values[item][0], centroid[0])
+      tmp.push(math_pow( math_pow(values[item][0]-centroid[0], 2) + math_pow(values[item][1]-centroid[1], 2), 0.5))
+    })
+    console.log(Math.max.apply(null, tmp))
+    return Math.max.apply(null, tmp)
   }
 
   getCentroid(cluster, values) {
@@ -182,7 +211,7 @@ class  ClusterLaba extends React.Component {
 
   render (){
     const { classes } = this.props;
-    const { values, viewSolution, step_0_values, step_1_values, step_2_values, step_3_values, columns, first_cluster, second_cluster, first_centroid,second_centroid, dataPoints } = this.state;
+    const { values, viewSolution, step_0_values, step_1_values, step_2_values, step_3_values, columns, first_cluster, second_cluster, first_centroid,second_centroid, dataPoints, radius_2, radius_1, disp_1, disp_2 } = this.state;
 
     const handleChange = (i, j) => event => {
       let newValues = values;
@@ -192,9 +221,9 @@ class  ClusterLaba extends React.Component {
 
     const calculateClick = () => {
       let step_0 = this.step_zero()
-      let step_1 = this.iteration_step(step_0)
-      let step_2 = this.iteration_step(step_1)
-      let step_3 = this.iteration_step(step_2)
+      let step_1 = this.iteration_step(step_0, 'Шаг 1: Метод ближнего соседа')
+      let step_2 = this.iteration_step(step_1, 'Шаг 2:')
+      let step_3 = this.iteration_step(step_2, 'Шаг 3:')
       let first_cluster = getCluster(JSON.parse(step_3.columns[0]))
       let second_cluster = getCluster(JSON.parse(step_3.columns[1]))
       let first_centroid = this.getCentroid(first_cluster, values)
@@ -223,7 +252,11 @@ class  ClusterLaba extends React.Component {
         color: 'red',
       })
 
-      console.log(dataPoints)
+      let disp_1 = this.getDisp(first_cluster, values, first_centroid)
+      let disp_2 = this.getDisp(second_cluster, values, second_centroid)
+
+      let radius_1 = this.getRadius(first_cluster, values, first_centroid)
+      let radius_2 = this.getRadius(second_cluster, values, second_centroid)
 
       this.setState({
         step_0_values: step_0,
@@ -234,6 +267,10 @@ class  ClusterLaba extends React.Component {
         second_cluster: second_cluster,
         first_centroid: first_centroid,
         second_centroid: second_centroid,
+        disp_1: disp_1,
+        disp_2: disp_2,
+        radius_1: radius_1,
+        radius_2: radius_2,
         dataPoints: dataPoints
       }, function(){
         this.setState({viewSolution: true})
@@ -257,33 +294,32 @@ class  ClusterLaba extends React.Component {
                   columns.map(function(item, index){
                     return (
                       <TableRow key={index}>
-                      <TableCell align="right">{index+1}</TableCell>
-                      <TableCell align="right">
-                        <TextField
-                          id={`item_${index}_0`}
-                          className={classes.textFieldLeft}
-                          value={values[columns[index]][0]}
-                          margin="normal"
-                          type="number"
-                          onChange={handleChange(index, 0)}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
-                        </TableCell>
-                      <TableCell align="right">
-
-                        <TextField
-                          id={`item_${index}_1`}
-                          className={classes.textFieldRight}
-                          value={values[columns[index]][1]}
-                          margin="normal"
-                          type="number"
-                          onChange={handleChange(index, 1)}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
+                        <TableCell align="right">{item}</TableCell>
+                        <TableCell align="right" className={classes.dataCell}>
+                          <TextField
+                            id={`item_${index}_0`}
+                            className={classes.textFieldLeft}
+                            value={values[columns[index]][0]}
+                            margin="normal"
+                            type="number"
+                            onChange={handleChange(index, 0)}
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                          />
+                          </TableCell>
+                        <TableCell align="right"  className={classes.dataCell}>
+                          <TextField
+                            id={`item_${index}_1`}
+                            className={classes.textFieldRight}
+                            value={values[columns[index]][1]}
+                            margin="normal"
+                            type="number"
+                            onChange={handleChange(index, 1)}
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                          />
                         </TableCell>
 
                       </TableRow>
@@ -327,6 +363,70 @@ class  ClusterLaba extends React.Component {
         minValue={step_3_values.minValue} 
         title={step_3_values.title}
         />
+        <Typography variant="h5" gutterBottom>
+          Шаг 4: Характеристики кластера
+        </Typography>
+        <Paper className={classes.root}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>t</TableCell>
+                  <TableCell align="right">A1</TableCell>
+                  <TableCell align="right">A2</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {
+                  columns.map(function(item, index){
+                    return (
+                      <TableRow key={index}>
+                        <TableCell align="right">{item}</TableCell>
+                        <TableCell align="right" className={first_cluster.includes(parseInt(item)) ? classes.dataCellYellow : classes.dataCell}>
+                          {values[item][0]}
+                        </TableCell>
+                        <TableCell align="right" className={first_cluster.includes(parseInt(item)) ? classes.dataCellYellow : classes.dataCell}>{values[item][1]}</TableCell>
+                      </TableRow>
+                    )
+                  })
+                }
+              </TableBody>
+            </Table>
+          </Paper>
+          <Paper className={classes.root}>
+            <Typography variant="h6" gutterBottom>
+              Кластер ({first_cluster.toString()}):
+            </Typography>
+            <Typography gutterBottom>
+              Центр тяжести кластера : ({first_centroid.toString()})
+            </Typography>
+            <Typography gutterBottom>
+              Дисперсия : {disp_1}
+            </Typography>
+            <Typography gutterBottom>
+              Среднеквадратичное отклонение объектов относительно центра кластера : {math_pow(disp_1,0.5)}
+            </Typography>
+            <Typography gutterBottom>
+              Радиус : {radius_1}
+            </Typography>
+          </Paper>
+
+          <Paper className={classes.root}>
+            <Typography variant="h6" gutterBottom>
+              Кластер ({first_cluster.toString()}):
+            </Typography>
+            <Typography gutterBottom>
+              Центр тяжести кластера : ({first_centroid.toString()})
+            </Typography>
+            <Typography gutterBottom>
+              Дисперсия : {disp_1}
+            </Typography>
+            <Typography gutterBottom>
+              Среднеквадратичное отклонение объектов относительно центра кластера : {math_pow(disp_1,0.5)}
+            </Typography>
+            <Typography gutterBottom>
+              Радиус : {radius_1}
+            </Typography>
+          </Paper>
         <DrawChart dataPoints={dataPoints} />
       </Paper>
       }
