@@ -19,7 +19,8 @@ const styles = theme => ({
   },
   table: {
     maxWidth: 300,
-    backgroundColor: '#d6d6d6'
+    backgroundColor: '#d6d6d6',
+    whiteSpace: 'nowrap'
   },
   dataCell:{
     backgroundColor: 'white'

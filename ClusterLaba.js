@@ -29,6 +29,7 @@ const styles = theme => ({
     width: 'fit-content'
   },
   table: {
+    whiteSpace: 'nowrap',
     maxWidth: 300,
     backgroundColor: '#d6d6d6'
   },
