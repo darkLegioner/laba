@@ -242,6 +242,7 @@ class  ClusterLaba extends React.Component {
       )
     }
 
+
     const calculateClick = () => {
       let step_0 = this.step_zero()
       let step_1 = this.iteration_step(step_0, 'Шаг 1: Метод ближнего соседа')
@@ -253,11 +254,12 @@ class  ClusterLaba extends React.Component {
       let second_centroid = this.getCentroid(second_cluster, values)
       let dataPoints = []
       columns.forEach(function(item){
+        let cluster = first_cluster.includes(parseInt(item)) ? '1':'2'
         dataPoints.push({
           x: values[item][0],
           y: values[item][1],
-          cluster: first_cluster.includes[item] ? '1':'2',
-          color: first_cluster.includes[item] ? 'green':'blue',
+          cluster: cluster,
+          color: cluster == 1 ? 'green':'blue',
         })
       })
 
